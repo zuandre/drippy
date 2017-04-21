@@ -122,7 +122,7 @@ router.route('/dams/:dam_location')
             var distval = dist;
 
             for(var i = 0; i < distval.length; i++){
-          
+
               munfinal.push({
                 municipality: muninfo[i].municipality,
                 restriction : muninfo[i].restrictions,
@@ -131,7 +131,7 @@ router.route('/dams/:dam_location')
             }
 
             munfinal.sort(function(a,b){
-              return a.result - b.result
+              return a.results - b.results
             })
 
               res.json(munfinal);
