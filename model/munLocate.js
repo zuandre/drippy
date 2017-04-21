@@ -3,7 +3,7 @@ var request = require("request")
 
 
   function req(url, cb){
-
+    //console.log(url);
     //var url = url;
     request({
         url: url,
@@ -21,11 +21,19 @@ var request = require("request")
 
 var destinations = "City of Cape Town|Oudtshoorn Municipality|Knysna Municipality|Bitou Municipality|Overstrand Municipality|Beaufort West Municipality|Kannaland Municipality|Hessequa Municipality|Breede Valley Municipality|Swartland Municipality|Matzikama Municipality|Laingsburg Municipality|Theeswaterskloof Municipality|Langeberg Municipality|George Municipality|Drakenstein Municipality|Saldanha Municipality|Prince Albert Municipality|Bergrivier Municipality|Mossel Bay Municipality|Stellenbosch Municipality|Swellendam Municipality|Witzenberg Municipality|Cape Agulhas Municipality|Cederberg Municipality";
 
-exports.find = function (loc){
+exports.find = function (loc,cb){
 
-    var distance = req("https://maps.googleapis.com/maps/api/distancematrix/json?origins="+loc+"&destinations="+destinations+"&key=AIzaSyCDYmGZqyojKaRvf249DdEQUSSycjgS15o",function (body){
+    var distance = req("https://maps.googleapis.com/maps/api/distancematrix/json?origins="+loc+"&destinations="+destinations+"&key=AIzaSyDl9XcyzbhpgFOIVKxXKPmTKTQzDhutgsI",function (body){
+      var results = body.rows[0].elements;
+      var distance =[];
+      var distval = [];
 
-      exports.dist = body;
+      for(var i = 0; i < results.length; i++){
+        distance[i] = results[i].distance;
+        distval[i]=distance[i].value;
+      }
+
+      cb(distval);
 });
 
 }

@@ -20,9 +20,11 @@ var request = require("request")
 
 
 // gettting all locations
-var locations = req("https://data.code4sa.org/resource/n6i8-b8c5.json",function (body){
+exports.locations =  function(cb){
 
+ req("https://data.code4sa.org/resource/n6i8-b8c5.json",function (body){
     //console.log(body);
-    exports.info= body;
+  cb(body);
+  });
 
-});
+}

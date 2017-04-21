@@ -19,9 +19,12 @@ var request = require("request")
   }
 
 // gettting all locations
-var locations = req("https://data.code4sa.org/resource/ckmf-ksyn.json",function (body){
+exports.locate = function(cb){
+req("https://data.code4sa.org/resource/ckmf-ksyn.json",function (body){
+  //  console.log(body);
+     cb(body);
+  });
 
-    //console.log(body);
-   exports.info= body;
 
-});
+
+}

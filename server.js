@@ -10,13 +10,16 @@ var request = require("request");
 
 
 // DAM --------models
-var locations =require('./model/dams.js');
+//var locations =require('./model/dams.js');
 var damInfo = require('./model/damInfo.js');
 var Locate = require('./model/locate.js');
+var currentInfo,dInfo;
+
 
 //Municiple ---------models
-var munInfo = require('./model/munInfo.js')
-var munLocate = require('./model/munLocate.js')
+var munInfo = require('./model/munInfo.js');
+var munLocate = require('./model/munLocate.js');
+var munifo;
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -42,40 +45,58 @@ router.use(function(req, res, next) {
   // ----------------------------------------------------
   router.route('/dams')
 
-  var loc = locations.dams;
+  //var loc = locations.dams;
 // on routes that end in /dams/:user_location
 // ----------------------------------------------------
 router.route('/dams/:dam_location')
     // get distance from user_location (accessed at GET http://localhost:8080/api/dams/:dam_location)
     .get(function(req, res) {
-       Locate.find(req.params.dam_location);
-        var distval = Locate.dist; //distance value in meters from all dams to locations
-        var dInfo = damInfo.info; // all dam info
-        var final = [];
-        for(var i=0; i < dInfo.length; i++){
 
-          if(distval[i] != -1){
+        damInfo.locations(function(info){
+        var  currentInfo = info; //get the lastest dam info
+          var dInfo = currentInfo; // all dam info
 
-         var results = parseFloat(dInfo[i].this_week) - parseFloat(dInfo[i].last_week)
+          var final = [];
+          console.log(dInfo);
+        Locate.find(req.params.dam_location,function(distance){
+             var distval = distance; //distance value in meters from all dams to locations
 
-         final.push({
-          name: dInfo[i].dam,
-          fsc:   dInfo[i].fsc,
-          last_week: dInfo[i].last_week,
-          last_year: dInfo[i].last_year,
-          river: dInfo[i].river,
-          this_week: dInfo[i].this_week,
-          distance: distval[i],
-          result:results
-       });
-     }
-   }
+            for(var i=0; i < dInfo.length; i++){
 
-   final.sort(function(a,b){
-       return a.distance - b.distance
- })
-            res.json(final);
-          //  res.json("lets",Locate.output);
+              if(distval[i] != -1){
+
+             var results = parseFloat(dInfo[i].this_week) - parseFloat(dInfo[i].last_week)
+
+             final.push({
+              name: dInfo[i].dam,
+              fsc:   dInfo[i].fsc,
+              last_week: dInfo[i].last_week,
+              last_year: dInfo[i].last_year,
+              river: dInfo[i].river,
+              this_week: dInfo[i].this_week,
+              distance: distval[i],
+              result:results
+            });
+            }
+          }
+
+          final.sort(function(a,b){
+            return a.distance - b.distance
+          })
+                  res.json(final);
+                  //  res.json("lets",Locate.output);
+
+
+                });
+
+
+
+        });
+
+
+
+
+
 
     });
 
@@ -84,44 +105,46 @@ router.route('/dams/:dam_location')
     // ----------------------------------------------------
     router.route('/municipality')
 
-    var loc = locations.dams;
+    //var loc = locations.dams;
   // on routes that end in /municiple/:mun_location
   // ----------------------------------------------------
   router.route('/municipality/:mun_location')
       // get distance from user_location (accessed at GET http://localhost:8080/api/municiple/:mun_location)
       .get(function(req, res) {
-        munLocate.find(req.params.mun_location);
 
-        var body = munInfo.info;
-        var final = [];
-        var body2 = munLocate.dist;
+        munInfo.locate(function(info){
+          var  muninfo = info;
+          //res.json(muninfo);
+          var munfinal = [];
+        //  console.log(muninfo);
 
-        var results = body2.rows[0].elements;
-        var distance =[];
-        var distval = [];
+          munLocate.find(req.params.mun_location,function(dist){
+            var distval = dist;
 
-        for(var i = 0; i < body.length; i++){
-          distance[i] = results[i].distance;
-          distval[i]=distance[i].value;
+            for(var i = 0; i < distval.length; i++){
+          
+              munfinal.push({
+                municipality: muninfo[i].municipality,
+                restriction : muninfo[i].restrictions,
+                results: distval[i]
+              });
+            }
 
-          final.push({
-            municipality: body[i].municipality,
-            restriction : body[i].restrictions,
-            results: distval[i]
+            munfinal.sort(function(a,b){
+              return a.result - b.result
+            })
+
+              res.json(munfinal);
           });
-        }
 
-        final.sort(function(a,b){
-          return a.result - b.result
-        })
+        });
 
-          res.json(final);
       });
 
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-    res.json(locations.dams);
+  //  res.json(locations.dams);
 });
 
 // more routes for our API will happen here
