@@ -22,7 +22,7 @@ var request = require("request")
 // gettting all locations
 exports.locations =  function(cb){
 
- req("https://data.code4sa.org/resource/n6i8-b8c5.json",function (body){
+ req("https://euphoric-glass-166014.appspot.com/api/scrape/dams",function (body){
     //console.log(body);
   cb(body);
   });

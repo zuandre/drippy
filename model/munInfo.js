@@ -22,7 +22,13 @@ var request = require("request")
 exports.locate = function(cb){
 req("https://data.code4sa.org/resource/ckmf-ksyn.json",function (body){
   //  console.log(body);
-     cb(body);
+  var destination = body[0].municipality;
+  for(var i=1; i < body.length; i++){
+    destination = destination+' | '+body[i].municipality;
+  }
+  //console.log(destination)
+    cb(body);
+
   });
 
 
